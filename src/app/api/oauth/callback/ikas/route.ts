@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
     const storeName = (state?.includes(':') ? state.split(':').slice(1).join(':') : null)
                       || url.searchParams.get('storeName') || '';
     const redirectUri = getRedirectUri(request.headers.get('host') ?? '');
-    console.log('[callback] storeName:', storeName, '| redirectUri:', redirectUri);
+    console.log('[callback] storeName:', storeName, '| redirectUri:', redirectUri, '| clientId:', config.oauth.clientId);
 
     if (!storeName) {
       return NextResponse.json({ error: { statusCode: 400, message: 'Missing storeName in state', params: allParams } }, { status: 400 });
@@ -159,7 +159,6 @@ export async function GET(request: NextRequest) {
       message: error?.message,
       response: error?.response?.data,
       status: error?.response?.status,
-      redirectUri: `${process.env.APP_URL || process.env.NEXT_PUBLIC_DEPLOY_URL}/api/oauth/callback/ikas`,
     };
     console.error('Callback error:', JSON.stringify(errDetail));
     return NextResponse.json({ error: { statusCode: 500, message: 'Callback failed', detail: errDetail } }, { status: 500 });

@@ -81,9 +81,10 @@ export async function onCheckToken(token?: AuthToken): Promise<{ accessToken: st
  * @returns The correct redirect URI for OAuth callback
  */
 export const getRedirectUri = (host: string) => {
-  if (!host) return config.oauth.redirectUri;
+  const cleanHost = host.trim();
+  if (!cleanHost) return config.oauth.redirectUri;
 
-  const isLocalhost = host.includes('localhost') || host.includes('127.0.0.1');
+  const isLocalhost = cleanHost.includes('localhost') || cleanHost.includes('127.0.0.1');
   const protocol = isLocalhost ? 'http' : 'https';
-  return `${protocol}://${host}/api/oauth/callback/ikas`;
+  return `${protocol}://${cleanHost}/api/oauth/callback/ikas`;
 };
