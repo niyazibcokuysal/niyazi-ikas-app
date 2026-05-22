@@ -1,5 +1,5 @@
 import { config } from '@/globals/config';
-import { getSession, setSession } from '@/lib/session';
+import { setSession } from '@/lib/session';
 import { validateRequest } from '@/lib/validation';
 import { OAuthAPI } from '@ikas/admin-api-client';
 import moment from 'moment';
@@ -47,18 +47,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
-    // Retrieve session and optionally check state for CSRF protection
-    const session = await getSession();
-    if (state && session.state && session.state !== state) {
-      return NextResponse.json({ error: 'Invalid state parameter' }, { status: 400 });
-    }
-
-    const storeName = (session.storeName || '') as string;
+    // Extract storeName from state parameter (format: "{random}:{storeName}")
+    const storeName = state?.includes(':') ? state.split(':').slice(1).join(':') : '';
     const redirectUri = getRedirectUri(request.headers.get('host') ?? '');
-    console.log('[callback] storeName:', storeName, '| redirectUri:', redirectUri, '| clientId:', config.oauth.clientId);
 
     if (!storeName) {
-      return NextResponse.json({ error: { statusCode: 400, message: 'Missing storeName in session' } }, { status: 400 });
+      return NextResponse.json({ error: { statusCode: 400, message: 'Missing storeName in state' } }, { status: 400 });
     }
 
     // Exchange authorization code for access/refresh tokens
@@ -132,14 +126,12 @@ export async function GET(request: NextRequest) {
     // Store the token for future use
     await AuthTokenManager.put(token);
 
-    // Update session with new merchant and app IDs, clear state, and set expiration
-    session.expiresAt = new Date(Date.now() + 3600 * 1000);
-    session.merchantId = merchantId;
-    session.authorizedAppId = authorizedAppId;
-    delete session.state;
-
-    // Save updated session
-    await setSession(session);
+    // Save session with merchant and app IDs
+    await setSession({
+      expiresAt: new Date(Date.now() + 3600 * 1000),
+      merchantId,
+      authorizedAppId,
+    });
 
     // Create a JWT for the merchant and authorized app
     const jwtToken = JwtHelpers.createToken(merchantId, authorizedAppId);

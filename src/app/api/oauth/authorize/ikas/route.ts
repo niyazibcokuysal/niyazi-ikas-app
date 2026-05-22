@@ -1,6 +1,5 @@
 import { config } from '@/globals/config';
 import { getRedirectUri } from '@/helpers/api-helpers';
-import { getSession, setSession } from '@/lib/session';
 import { validateRequest } from '@/lib/validation';
 import { OAuthAPI } from '@ikas/admin-api-client';
 import { NextRequest, NextResponse } from 'next/server';
@@ -34,16 +33,8 @@ export async function GET(request: NextRequest) {
 
     const { storeName } = validation.data;
 
-    // Generate a random state string for CSRF protection
-    const state = Math.random().toFixed(16);
-
-    // Retrieve the current session and update it with state and storeName
-    const session = await getSession();
-    session.state = state;
-    session.storeName = storeName;
-
-    // Save the updated session before redirecting
-    await setSession(session);
+    // Encode storeName into state: "{random}:{storeName}"
+    const state = `${Math.random().toFixed(16)}:${storeName}`;
 
     // Generate the base OAuth URL for the given store
     const oauthBaseUrl = OAuthAPI.getOAuthUrl({ storeName });
