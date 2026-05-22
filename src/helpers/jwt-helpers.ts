@@ -12,7 +12,7 @@ export class JwtHelpers {
    */
   static verifyToken(token: string) {
     try {
-      return verify(token, process.env.CLIENT_SECRET || '', {}) as JwtPayload;
+      return verify(token, (process.env.CLIENT_SECRET || '').trim(), {}) as JwtPayload;
     } catch (e) {
       console.error('Error verifying token:', e);
       return;
@@ -26,7 +26,7 @@ export class JwtHelpers {
    * @param authorizedAppId Id of the app which is unique per store and per installation
    */
   static createToken(merchantId: string, authorizedAppId: string) {
-    return sign({}, process.env.CLIENT_SECRET || '', {
+    return sign({}, (process.env.CLIENT_SECRET || '').trim(), {
       expiresIn: '4h', // 4 Hours
       algorithm: 'HS256',
       subject: merchantId,
