@@ -147,8 +147,7 @@ export async function GET(request: NextRequest) {
     // Redirect the user to the callback URL
     return NextResponse.redirect(new URL(`/callback?${callbackUrl.toString()}`, getRedirectUri(request.headers.get('host')!)));
   } catch (error) {
-    // Log and return error response
-    console.error('Callback error:', error);
+    console.error('Callback error:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
     return NextResponse.json({ error: { statusCode: 500, message: 'Callback failed' } }, { status: 500 });
   }
 }
