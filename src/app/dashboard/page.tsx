@@ -21,7 +21,9 @@ export interface MeData {
   email?: string;
   firstName?: string;
   lastName?: string;
+  fullName?: string;
   id?: string;
+  _jwtPayload?: Record<string, unknown>;
   [key: string]: unknown;
 }
 
@@ -83,12 +85,22 @@ export default function DashboardPage() {
         await fetchMerchant(fetchedToken);
         try {
           const meData = await AppBridgeHelper.getMeData();
-          // getMeData may return a string (email) or an object
-          if (typeof meData === 'string') {
-            setMe({ email: meData });
-          } else if (meData && typeof meData === 'object') {
-            setMe(meData as unknown as MeData);
+          const meObj: MeData = typeof meData === 'string'
+            ? { fullName: meData }
+            : (meData as unknown as MeData) || {};
+
+          // Also try to extract email from the JWT token payload
+          if (fetchedToken) {
+            try {
+              const payload = JSON.parse(atob(fetchedToken.split('.')[1]));
+              if (payload.email) meObj.email = payload.email;
+              if (payload.firstName) meObj.firstName = payload.firstName;
+              if (payload.lastName) meObj.lastName = payload.lastName;
+              meObj._jwtPayload = payload;
+            } catch {}
           }
+
+          setMe(meObj);
         } catch (error) {
           console.error('Error fetching me data:', error);
         }

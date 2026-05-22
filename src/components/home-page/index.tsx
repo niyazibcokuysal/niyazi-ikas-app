@@ -73,7 +73,8 @@ const HomePage: React.FC<HomePageProps> = ({ token, merchant, me, activeSubscrip
                 </div>
               )}
               <div className="mt-2 text-xs text-muted-foreground break-all bg-muted rounded p-2">
-                raw: {JSON.stringify(me)}
+                <div>meData: {JSON.stringify({ ...me, _jwtPayload: undefined })}</div>
+                <div className="mt-1">jwt: {JSON.stringify(me._jwtPayload)}</div>
               </div>
             </CardContent>
           </Card>
