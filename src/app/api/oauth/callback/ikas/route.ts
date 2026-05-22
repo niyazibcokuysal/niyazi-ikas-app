@@ -47,19 +47,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
-    // Log all query params to understand what ikas sends
-    const allParams: Record<string, string> = {};
-    url.searchParams.forEach((v, k) => { allParams[k] = v; });
-    console.log('[callback] all params:', JSON.stringify(allParams));
-
     // Extract storeName: from state param or from ikas's storeName query param
     const storeName = (state?.includes(':') ? state.split(':').slice(1).join(':') : null)
                       || url.searchParams.get('storeName') || '';
     const redirectUri = getRedirectUri(request.headers.get('host') ?? '');
-    console.log('[callback] storeName:', storeName, '| redirectUri:', redirectUri, '| clientId:', config.oauth.clientId);
 
     if (!storeName) {
-      return NextResponse.json({ error: { statusCode: 400, message: 'Missing storeName in state', params: allParams } }, { status: 400 });
+      return NextResponse.json({ error: { statusCode: 400, message: 'Missing storeName' } }, { status: 400 });
     }
 
     // Exchange authorization code for access/refresh tokens
@@ -75,9 +69,7 @@ export async function GET(request: NextRequest) {
       },
     );
 
-    console.log('[callback] tokenResponse success:', tokenResponse.isSuccess, '| hasData:', !!tokenResponse.data);
-
-    if (!tokenResponse.data) {
+if (!tokenResponse.data) {
       return NextResponse.json({ error: { statusCode: 500, message: 'Failed to retrieve token' } }, { status: 500 });
     }
 
