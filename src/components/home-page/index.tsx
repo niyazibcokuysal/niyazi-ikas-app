@@ -72,6 +72,9 @@ const HomePage: React.FC<HomePageProps> = ({ token, merchant, me, activeSubscrip
                   <span className="font-medium text-sm">{me.email as string}</span>
                 </div>
               )}
+              <div className="mt-2 text-xs text-muted-foreground break-all bg-muted rounded p-2">
+                raw: {JSON.stringify(me)}
+              </div>
             </CardContent>
           </Card>
         )}
