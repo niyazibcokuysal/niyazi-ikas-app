@@ -52,10 +52,11 @@ export async function GET(request: NextRequest) {
     url.searchParams.forEach((v, k) => { allParams[k] = v; });
     console.log('[callback] all params:', JSON.stringify(allParams));
 
-    // Extract storeName from state parameter (format: "{random}:{storeName}")
-    const storeName = state?.includes(':') ? state.split(':').slice(1).join(':') :
-                      (url.searchParams.get('storeName') || '');
+    // Extract storeName: from state param or from ikas's storeName query param
+    const storeName = (state?.includes(':') ? state.split(':').slice(1).join(':') : null)
+                      || url.searchParams.get('storeName') || '';
     const redirectUri = getRedirectUri(request.headers.get('host') ?? '');
+    console.log('[callback] storeName:', storeName, '| redirectUri:', redirectUri);
 
     if (!storeName) {
       return NextResponse.json({ error: { statusCode: 400, message: 'Missing storeName in state', params: allParams } }, { status: 400 });
