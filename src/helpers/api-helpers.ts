@@ -83,16 +83,7 @@ export async function onCheckToken(token?: AuthToken): Promise<{ accessToken: st
 export const getRedirectUri = (host: string) => {
   if (!host) return config.oauth.redirectUri;
 
-  // If config uses localhost but request is from different host (e.g., trycloudflare.com)
-  if (config.oauth.redirectUri.includes('localhost') && !host.includes('localhost')) {
-    // Replace localhost with actual host for production deployments
-    const redirectUri = new URL(config.oauth.redirectUri);
-    redirectUri.host = host;
-    redirectUri.protocol = 'https';
-    redirectUri.port = '443';
-    return redirectUri.toString();
-  }
-
-  // Use configured redirect URI as-is
-  return config.oauth.redirectUri;
+  const isLocalhost = host.includes('localhost') || host.includes('127.0.0.1');
+  const protocol = isLocalhost ? 'http' : 'https';
+  return `${protocol}://${host}/api/oauth/callback/ikas`;
 };
