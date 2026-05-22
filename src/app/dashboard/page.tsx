@@ -83,7 +83,12 @@ export default function DashboardPage() {
         await fetchMerchant(fetchedToken);
         try {
           const meData = await AppBridgeHelper.getMeData();
-          setMe(meData as unknown as MeData);
+          // getMeData may return a string (email) or an object
+          if (typeof meData === 'string') {
+            setMe({ email: meData });
+          } else if (meData && typeof meData === 'object') {
+            setMe(meData as unknown as MeData);
+          }
         } catch (error) {
           console.error('Error fetching me data:', error);
         }
