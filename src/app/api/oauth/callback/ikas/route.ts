@@ -62,9 +62,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: { statusCode: 400, message: 'Missing storeName in state', params: allParams } }, { status: 400 });
     }
 
-    // Return debug info before token exchange
-    return NextResponse.json({ debug: { storeName, redirectUri, allParams } }, { status: 200 });
-
     // Exchange authorization code for access/refresh tokens
     const tokenResponse = await OAuthAPI.getTokenWithAuthorizationCode(
       {
@@ -160,9 +157,9 @@ export async function GET(request: NextRequest) {
   } catch (error: any) {
     const errDetail = {
       message: error?.message,
-      stack: error?.stack?.split('\n')[0],
       response: error?.response?.data,
       status: error?.response?.status,
+      redirectUri: `${process.env.APP_URL || process.env.NEXT_PUBLIC_DEPLOY_URL}/api/oauth/callback/ikas`,
     };
     console.error('Callback error:', JSON.stringify(errDetail));
     return NextResponse.json({ error: { statusCode: 500, message: 'Callback failed', detail: errDetail } }, { status: 500 });
