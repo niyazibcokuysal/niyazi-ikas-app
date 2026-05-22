@@ -85,22 +85,8 @@ export default function DashboardPage() {
         await fetchMerchant(fetchedToken);
         try {
           const meData = await AppBridgeHelper.getMeData();
-          const meObj: MeData = typeof meData === 'string'
-            ? { fullName: meData }
-            : (meData as unknown as MeData) || {};
-
-          // Also try to extract email from the JWT token payload
-          if (fetchedToken) {
-            try {
-              const payload = JSON.parse(atob(fetchedToken.split('.')[1]));
-              if (payload.email) meObj.email = payload.email;
-              if (payload.firstName) meObj.firstName = payload.firstName;
-              if (payload.lastName) meObj.lastName = payload.lastName;
-              meObj._jwtPayload = payload;
-            } catch {}
-          }
-
-          setMe(meObj);
+          // getMeData returns the full name of the logged-in user
+          if (meData) setMe({ fullName: meData as unknown as string });
         } catch (error) {
           console.error('Error fetching me data:', error);
         }

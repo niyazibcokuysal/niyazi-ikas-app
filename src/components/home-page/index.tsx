@@ -58,24 +58,15 @@ const HomePage: React.FC<HomePageProps> = ({ token, merchant, me, activeSubscrip
               <CardDescription>Currently viewing this app</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              {(me.firstName || me.lastName) && (
+              {me.fullName && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Name:</span>
-                  <span className="font-medium">{[me.firstName, me.lastName].filter(Boolean).join(' ')}</span>
+                  <span className="font-medium">{me.fullName as string}</span>
                 </div>
               )}
-              {me.email && (
-                <div className="flex justify-between items-center gap-2">
-                  <span className="text-muted-foreground flex items-center gap-1">
-                    <Mail className="h-3.5 w-3.5" /> Email:
-                  </span>
-                  <span className="font-medium text-sm">{me.email as string}</span>
-                </div>
-              )}
-              <div className="mt-2 text-xs text-muted-foreground break-all bg-muted rounded p-2">
-                <div>meData: {JSON.stringify({ ...me, _jwtPayload: undefined })}</div>
-                <div className="mt-1">jwt: {JSON.stringify(me._jwtPayload)}</div>
-              </div>
+              <p className="text-xs text-muted-foreground">
+                Email bilgisi için Store Owner kartına bakın — <code>getMerchant().email</code> giriş yapan kullanıcının emailini döndürür.
+              </p>
             </CardContent>
           </Card>
         )}
