@@ -7,8 +7,8 @@ export const config = {
   // OAuth configuration
   oauth: {
     scope: 'read_orders,write_orders,read_products,read_inventories,write_inventories',
-    clientId: process.env.NEXT_PUBLIC_CLIENT_ID,
-    clientSecret: process.env.CLIENT_SECRET,
+    clientId: (process.env.NEXT_PUBLIC_CLIENT_ID || '').trim(),
+    clientSecret: (process.env.CLIENT_SECRET || '').trim(),
     redirectUri: `${(process.env.APP_URL || process.env.NEXT_PUBLIC_DEPLOY_URL || '').trim()}/api/oauth/callback/ikas`,
   }
 };
