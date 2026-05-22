@@ -53,21 +53,30 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid state parameter' }, { status: 400 });
     }
 
+    const storeName = (session.storeName || '') as string;
+    const redirectUri = getRedirectUri(request.headers.get('host') ?? '');
+    console.log('[callback] storeName:', storeName, '| redirectUri:', redirectUri, '| clientId:', config.oauth.clientId);
+
+    if (!storeName) {
+      return NextResponse.json({ error: { statusCode: 400, message: 'Missing storeName in session' } }, { status: 400 });
+    }
+
     // Exchange authorization code for access/refresh tokens
     const tokenResponse = await OAuthAPI.getTokenWithAuthorizationCode(
       {
         code: code as string,
         client_id: config.oauth.clientId!,
         client_secret: config.oauth.clientSecret!,
-        redirect_uri: getRedirectUri(request.headers.get('host')!),
+        redirect_uri: redirectUri,
       },
       {
-        storeName: (session.storeName || 'api') as string,
+        storeName,
       },
     );
 
+    console.log('[callback] tokenResponse success:', tokenResponse.isSuccess, '| hasData:', !!tokenResponse.data);
+
     if (!tokenResponse.data) {
-      // Failed to get token
       return NextResponse.json({ error: { statusCode: 500, message: 'Failed to retrieve token' } }, { status: 500 });
     }
 
