@@ -153,8 +153,14 @@ export async function GET(request: NextRequest) {
 
     // Redirect the user to the callback URL
     return NextResponse.redirect(new URL(`/callback?${callbackUrl.toString()}`, getRedirectUri(request.headers.get('host')!)));
-  } catch (error) {
-    console.error('Callback error:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
-    return NextResponse.json({ error: { statusCode: 500, message: 'Callback failed' } }, { status: 500 });
+  } catch (error: any) {
+    const errDetail = {
+      message: error?.message,
+      stack: error?.stack?.split('\n')[0],
+      response: error?.response?.data,
+      status: error?.response?.status,
+    };
+    console.error('Callback error:', JSON.stringify(errDetail));
+    return NextResponse.json({ error: { statusCode: 500, message: 'Callback failed', detail: errDetail } }, { status: 500 });
   }
 }
