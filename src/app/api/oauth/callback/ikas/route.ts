@@ -5,7 +5,7 @@ import { OAuthAPI } from '@ikas/admin-api-client';
 import moment from 'moment';
 import { getIkas, getRedirectUri } from '@/helpers/api-helpers';
 import { JwtHelpers } from '@/helpers/jwt-helpers';
-import { TokenHelpers } from '@/helpers/token-helpers';
+import { validateCodeSignature } from '@/helpers/server-helpers';
 import { AuthToken } from '@/models/auth-token';
 import { AuthTokenManager } from '@/models/auth-token/manager';
 import { NextRequest, NextResponse } from 'next/server';
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
     const { code, state, signature } = validation.data;
 
     // Validate code signature
-    if (signature && !TokenHelpers.validateCodeSignature(code, signature, config.oauth.clientSecret!)) {
+    if (signature && !validateCodeSignature(code, signature, config.oauth.clientSecret!)) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
     }
 

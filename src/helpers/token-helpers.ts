@@ -1,6 +1,5 @@
 import { AppBridgeHelper } from '@ikas/app-helpers';
 import { useRouter } from 'next/navigation';
-import crypto from 'crypto';
 
 /** Key used for storing tokens in session storage */
 const TOKEN_KEY = 'token';
@@ -146,8 +145,4 @@ export class TokenHelpers {
    * - Compares signatures using strict equality
    * - Should be called before exchanging authorization code for tokens
    */
-  static validateCodeSignature = (code: string, receivedSignature: string, secret: string): boolean => {
-    const expectedSignature = crypto.createHmac('sha256', secret).update(code, 'utf8').digest('hex');
-    return expectedSignature === receivedSignature;
-  };
 }
