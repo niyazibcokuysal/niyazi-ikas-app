@@ -17,10 +17,19 @@ function findActiveAppSubscription(
   return subscriptions.find((s) => !s.deleted) ?? null;
 }
 
+export interface MeData {
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  id?: string;
+  [key: string]: unknown;
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const [token, setToken] = useState<string | null>(null);
   const [merchant, setMerchant] = useState<GetMerchantQueryData | null>(null);
+  const [me, setMe] = useState<MeData | null>(null);
   const [activeSubscription, setActiveSubscription] =
     useState<MerchantAppSubscription | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -72,6 +81,12 @@ export default function DashboardPage() {
 
       if (fetchedToken) {
         await fetchMerchant(fetchedToken);
+        try {
+          const meData = await AppBridgeHelper.getMeData();
+          setMe(meData as unknown as MeData);
+        } catch (error) {
+          console.error('Error fetching me data:', error);
+        }
       }
     } catch (error) {
       console.error('Error initializing dashboard:', error);
@@ -94,5 +109,5 @@ export default function DashboardPage() {
     return <Loading />;
   }
 
-  return <HomePage token={token} merchant={merchant} activeSubscription={activeSubscription} />;
+  return <HomePage token={token} merchant={merchant} me={me} activeSubscription={activeSubscription} />;
 }

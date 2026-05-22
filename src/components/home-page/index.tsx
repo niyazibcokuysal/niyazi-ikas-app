@@ -3,6 +3,7 @@ import { CheckCircle2, Crown, Mail, Phone, MapPin, User } from 'lucide-react';
 import { MerchantAppSubscription } from '@/types/subscription';
 import { GetMerchantQueryData, SubscriptionPeriodEnum } from '@/lib/ikas-client/generated/graphql';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { MeData } from '@/app/dashboard/page';
 
 const PERIOD_LABELS: Record<SubscriptionPeriodEnum, string> = {
   [SubscriptionPeriodEnum.MONTHLY]: 'monthly',
@@ -13,10 +14,11 @@ const PERIOD_LABELS: Record<SubscriptionPeriodEnum, string> = {
 interface HomePageProps {
   token: string | null;
   merchant?: GetMerchantQueryData | null;
+  me?: MeData | null;
   activeSubscription?: MerchantAppSubscription | null;
 }
 
-const HomePage: React.FC<HomePageProps> = ({ token, merchant, activeSubscription }) => {
+const HomePage: React.FC<HomePageProps> = ({ token, merchant, me, activeSubscription }) => {
   if (!token) {
     return (
       <div className="max-w-[1200px] mx-auto p-6 bg-background min-h-[100vh]">
@@ -45,6 +47,35 @@ const HomePage: React.FC<HomePageProps> = ({ token, merchant, activeSubscription
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 max-w-3xl mx-auto">
+
+        {me && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="h-5 w-5 text-green-500" />
+                Logged In User
+              </CardTitle>
+              <CardDescription>Currently viewing this app</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {(me.firstName || me.lastName) && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Name:</span>
+                  <span className="font-medium">{[me.firstName, me.lastName].filter(Boolean).join(' ')}</span>
+                </div>
+              )}
+              {me.email && (
+                <div className="flex justify-between items-center gap-2">
+                  <span className="text-muted-foreground flex items-center gap-1">
+                    <Mail className="h-3.5 w-3.5" /> Email:
+                  </span>
+                  <span className="font-medium text-sm">{me.email as string}</span>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
