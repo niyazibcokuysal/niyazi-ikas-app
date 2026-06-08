@@ -82,7 +82,11 @@ export default function DashboardPage() {
       setToken(fetchedToken || null);
 
       if (fetchedToken) {
-        await fetchMerchant(fetchedToken);
+        // Skip DB-backed calls (getMerchant hits Prisma/Supabase via AuthTokenManager) in local dev
+        // so the dashboard doesn't hang waiting on a local DB connection.
+        if (process.env.NODE_ENV !== 'development') {
+          await fetchMerchant(fetchedToken);
+        }
         try {
           const meData = await AppBridgeHelper.getMeData();
           // getMeData returns the full name of the logged-in user

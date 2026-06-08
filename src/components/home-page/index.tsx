@@ -64,9 +64,6 @@ const HomePage: React.FC<HomePageProps> = ({ token, merchant, me, activeSubscrip
                   <span className="font-medium">{me.fullName as string}</span>
                 </div>
               )}
-              <p className="text-xs text-muted-foreground">
-                Email bilgisi için Store Owner kartına bakın — <code>getMerchant().email</code> giriş yapan kullanıcının emailini döndürür.
-              </p>
             </CardContent>
           </Card>
         )}
